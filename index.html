@@ -1,6 +1,22 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-<meta http-equiv="refresh" content="0; url=docs/index.md">
+  <meta charset="UTF-8">
+  <title>Markdown remoto</title>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
+
+<body>
+  <div id="content"></div>
+
+  <script>
+    fetch("https://raw.githubusercontent.com/vjp-antonioPD/PPS-Unidad0-Tarea-antonio/refs/heads/main/docs/index.md")
+      .then(res => res.text())
+      .then(md => {
+        document.getElementById("content").innerHTML = marked.parse(md);
+      })
+      .catch(err => console.error("Error cargando Markdown:", err));
+  </script>
+</body>
 </html>
+
