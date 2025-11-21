@@ -4,19 +4,44 @@
   <meta charset="UTF-8">
   <title>Markdown remoto</title>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 800px; margin: 40px auto; }
+  </style>
 </head>
-
 <body>
-  <div id="content"></div>
 
-  <script>
-    fetch("https://raw.githubusercontent.com/vjp-antonioPD/PPS-Unidad0-Tarea-antonio/refs/heads/main/docs/index.md")
-      .then(res => res.text())
-      .then(md => {
-        document.getElementById("content").innerHTML = marked.parse(md);
-      })
-      .catch(err => console.error("Error cargando Markdown:", err));
-  </script>
+<div id="content"></div>
+
+<script>
+  const repoRawBase =
+    "https://raw.githubusercontent.com/vjp-antonioPD/PPS-Unidad0-Tarea-antonio/refs/heads/main/docs/";
+
+  fetch(repoRawBase + "index.md")
+    .then(res => res.text())
+    .then(md => {
+      // Convertir Markdown a HTML
+      const html = marked.parse(md);
+
+      // Crear contenedor temporal para modificar enlaces
+      const temp = document.createElement("div");
+      temp.innerHTML = html;
+
+      // Reescribir todos los <a>
+      temp.querySelectorAll("a").forEach(a => {
+        const href = a.getAttribute("href");
+
+        // Si el enlace NO es absoluto → convertirlo a RAW
+        if (href && !href.startsWith("http") && !href.startsWith("#")) {
+          a.href = repoRawBase + href;
+          a.target = "_blank"; // opcional
+        }
+      });
+
+      document.getElementById("content").innerHTML = temp.innerHTML;
+    })
+    .catch(err => console.error("Error cargando Markdown:", err));
+</script>
+
 </body>
 </html>
 
