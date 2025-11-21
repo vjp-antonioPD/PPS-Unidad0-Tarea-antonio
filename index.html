@@ -4,8 +4,12 @@
   <meta charset="UTF-8">
   <title>Markdown remoto</title>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
   <style>
-    body { font-family: Arial, sans-serif; max-width: 800px; margin: 40px auto; }
+    body { font-family: Arial, sans-serif; max-width: 900px; margin: 40px auto; padding: 20px; }
+    img { max-width: 100%; height: auto; }
+    pre { background: #f4f4f4; padding: 10px; overflow-x: auto; }
+    a { cursor: pointer; color: #0645ad; }
   </style>
 </head>
 <body>
@@ -13,33 +17,68 @@
 <div id="content"></div>
 
 <script>
-  const repoRawBase =
-    "https://raw.githubusercontent.com/vjp-antonioPD/PPS-Unidad0-Tarea-antonio/refs/heads/main/docs/";
+  const repoRawBase = "https://raw.githubusercontent.com/vjp-antonioPD/PPS-Unidad0-Tarea-antonio/refs/heads/main/docs/";
 
-  fetch(repoRawBase + "index.md")
-    .then(res => res.text())
-    .then(md => {
-      // Convertir Markdown a HTML
-      const html = marked.parse(md);
+  function resolvePath(current, relative) {
+    // Si el enlace ya es absoluto, devolverlo tal cual
+    if (relative.startsWith("http") || relative.startsWith("data:") || relative.startsWith("#")) {
+      return relative;
+    }
 
-      // Crear contenedor temporal para modificar enlaces
-      const temp = document.createElement("div");
-      temp.innerHTML = html;
+    // Obtener carpeta del archivo actual
+    let folder = current.substring(0, current.lastIndexOf("/") + 1);
 
-      // Reescribir todos los <a>
-      temp.querySelectorAll("a").forEach(a => {
-        const href = a.getAttribute("href");
+    // Crear una URL que resuelva rutas relativas correctamente
+    return new URL(relative, repoRawBase + folder).href.replace(repoRawBase, "");
+  }
 
-        // Si el enlace NO es absoluto → convertirlo a RAW
-        if (href && !href.startsWith("http") && !href.startsWith("#")) {
-          a.href = repoRawBase + href;
-          a.target = "_blank"; // opcional
-        }
+  function loadMarkdown(path = "index.md") {
+
+    fetch(repoRawBase + path)
+      .then(res => res.text())
+      .then(md => {
+        const html = marked.parse(md);
+        const temp = document.createElement("div");
+        temp.innerHTML = html;
+
+        // ⭐ Resolver imágenes relativas
+        temp.querySelectorAll("img").forEach(img => {
+          const src = img.getAttribute("src");
+          if (!src) return;
+
+          if (!src.startsWith("http") && !src.startsWith("data:")) {
+            const resolved = resolvePath(path, src);
+            img.src = repoRawBase + resolved;
+          }
+        });
+
+        // ⭐ Resolver enlaces relativos
+        temp.querySelectorAll("a").forEach(a => {
+          const href = a.getAttribute("href");
+          if (!href) return;
+          if (href.startsWith("http") || href.startsWith("#")) return;
+
+          const resolved = resolvePath(path, href);
+
+          // Cargar otro markdown en la misma página
+          a.addEventListener("click", ev => {
+            ev.preventDefault();
+            loadMarkdown(resolved);
+          });
+
+          a.href = "#" + resolved;
+        });
+
+        document.getElementById("content").innerHTML = temp.outerHTML;
+      })
+      .catch(err => {
+        document.getElementById("content").innerHTML =
+          "<p style='color:red;'>Error cargando: " + path + "</p>";
+        console.error(err);
       });
+  }
 
-      document.getElementById("content").innerHTML = temp.innerHTML;
-    })
-    .catch(err => console.error("Error cargando Markdown:", err));
+  loadMarkdown();
 </script>
 
 </body>
