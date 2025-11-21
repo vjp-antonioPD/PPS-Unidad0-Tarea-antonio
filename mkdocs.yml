@@ -1,0 +1,22 @@
+# mkdocs.yml
+
+# -------------------------------------------------------------
+# CONFIGURACIÓN GENERAL DEL SITIO
+# -------------------------------------------------------------
+site_name: Documentación de Calculadora Python # Define el título que aparecerá.
+
+# -------------------------------------------------------------
+# ESTRUCTURA DE NAVEGACIÓN (MENÚ)
+# -------------------------------------------------------------
+# Define la lista de enlaces y el orden de aparición en el menú de navegación principal.
+nav:
+  # El nombre de la sección en el menú:
+  - Home: index.md
+
+# -------------------------------------------------------------
+# DIRECTORIOS
+# -------------------------------------------------------------
+# Ruta de la carpeta que contiene todos los archivos .md (Markdown) de la documentación.
+# MkDocs buscará aquí los archivos.
+doc_dir: docs
+

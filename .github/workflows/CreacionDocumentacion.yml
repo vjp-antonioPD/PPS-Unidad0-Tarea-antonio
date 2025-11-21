@@ -1,0 +1,46 @@
+# -----------------------------------------------------------
+# CONFIGURACIÓN DEL WORKFLOW
+# -----------------------------------------------------------
+name: Deploy MkDocs
+
+on:
+
+  push:
+    # Este workflow se ejecutará automáticamente cada vez que se haga un 'push'
+    branches:
+      - main # Específicamente, solo se ejecuta si el push se realiza sobre la rama 'main'.
+
+# PERMISOS
+permissions:
+  contents: write # Permite que el token pueda leer y escribir contenido.
+  pages: write    # Permite gestionar y escribir en la configuración de GitHub Pages.
+  id-token: write # Permite solicitar tokens de OpenID Connect.
+
+
+# DEFINICIÓN DEL TRABAJO (JOB)
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+
+    # PASO 1: OBTENER EL CÓDIGO FUENTE
+    - name: Checkout Repo
+      uses: actions/checkout@v3
+
+    # PASO 2: CONFIGURAR PYTHON
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+
+    # PASO 3: INSTALAR DEPENDENCIAS
+    - name: Install dependencies
+      run: pip install mkdocs
+
+    # PASO 4: CONSTRUIR Y DESPLEGAR LA DOCUMENTACIÓN
+    - name: Deploy docs
+      run: mkdocs gh-deploy --force
+      # Configuración de variables de entorno específicas para este paso.
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
