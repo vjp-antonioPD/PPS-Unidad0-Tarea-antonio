@@ -9,9 +9,3 @@ En esta tarea desde un nuevo repositorio git, vamos a trabajar la creación de W
 *   [Configuracion GitHub Pages](gitPages.md)
 *   [Creacion de Docker](docker.md)
 *   [Conclusiones del Proyecto](conclusiones.md)
-
-*   [Configuración principal](../mkdocs.yml)
-*   [Requerimientos de Python](../requirements.txt)
-
-*   [Modulo principal de la GUI](../calculator/gui.py)
-*   [Workflow de GitHub Actions](../.github/workflows/CreacionDocumentacion.yml)
